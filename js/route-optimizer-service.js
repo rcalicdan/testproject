@@ -197,10 +197,19 @@ class RouteOptimizerService {
     }
 
     canOptimize() {
-        return this.data.selectedDriver &&
-            this.data.selectedDriver.id &&
-            this.data.orders.length > 0 &&
-            !this.data.loading;
+        const hasDriver = this.data.selectedDriver && this.data.selectedDriver.id;
+        const hasOrders = this.data.orders.length > 0;
+        const notLoading = !this.data.loading;
+
+        console.log('canOptimize check:', {
+            hasDriver,
+            hasOrders,
+            notLoading,
+            selectedDriver: this.data.selectedDriver,
+            ordersCount: this.data.orders.length
+        });
+
+        return hasDriver && hasOrders && notLoading;
     }
 
     getOptimizationSummary() {

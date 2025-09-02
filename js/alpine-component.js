@@ -1,5 +1,9 @@
 function routeOptimizer() {
     const data = new RouteOptimizerData();
+
+    // Set the selected driver BEFORE creating the services
+    data.selectedDriver = data.drivers[0];
+
     const mapManager = new MapManager(data);
     const optimizerService = new RouteOptimizerService(data);
 
@@ -12,9 +16,8 @@ function routeOptimizer() {
 
         init() {
             console.log('RouteOptimizer component initializing...');
-            
-            this.selectedDriver = this.drivers[0];
-            
+            console.log('Selected driver on init:', this.selectedDriver); // Add this debug log
+
             this.$nextTick(() => {
                 setTimeout(() => {
                     console.log('Initializing map...');
@@ -26,8 +29,13 @@ function routeOptimizer() {
         },
 
         async optimizeRoutes() {
+            console.log('optimizeRoutes called with driver:', this.selectedDriver); // Add debug log
+            console.log('Orders available:', this.orders.length); // Add debug log
+
             if (!optimizerService.canOptimize()) {
                 console.warn('Cannot optimize routes - missing driver or orders');
+                console.log('Driver check:', !!this.selectedDriver, this.selectedDriver);
+                console.log('Orders check:', this.orders.length);
                 return;
             }
 
@@ -70,20 +78,20 @@ function routeOptimizer() {
         },
 
         get totalDistance() {
-            return this.optimizationResult 
-                ? Math.round(this.optimizationResult.total_distance) 
+            return this.optimizationResult
+                ? Math.round(this.optimizationResult.total_distance)
                 : 0;
         },
 
         get totalTimeHours() {
-            return this.optimizationResult 
-                ? Math.round(this.optimizationResult.total_time / 60) 
+            return this.optimizationResult
+                ? Math.round(this.optimizationResult.total_time / 60)
                 : 0;
         },
 
         get totalTimeMinutes() {
-            return this.optimizationResult 
-                ? this.optimizationResult.total_time % 60 
+            return this.optimizationResult
+                ? this.optimizationResult.total_time % 60
                 : 0;
         },
 
@@ -132,7 +140,7 @@ function routeOptimizer() {
         },
 
         formatDistance(meters) {
-            return meters >= 1000 
+            return meters >= 1000
                 ? `${Math.round(meters / 1000)} km`
                 : `${meters} m`;
         },
@@ -191,11 +199,11 @@ function routeOptimizer() {
 
 window.routeOptimizer = routeOptimizer;
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM loaded, RouteOptimizer ready for Alpine.js initialization');
 });
 
-window.addEventListener('error', function(event) {
+window.addEventListener('error', function (event) {
     if (event.error && event.error.stack && event.error.stack.includes('routeOptimizer')) {
         console.error('RouteOptimizer Error:', event.error);
     }
