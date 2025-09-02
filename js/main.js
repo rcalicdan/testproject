@@ -1,4 +1,4 @@
-import { DRIVERS, ORDERS } from './data/mockData.js';
+import { DRIVERS, ORDERS } from './data/MockData.js';
 import { ApiService } from './services/ApiService.js';
 import { MapService } from './services/MapService.js';
 import { OptimizationService } from './services/OptimizationService.js';
