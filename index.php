@@ -15,7 +15,7 @@
 
     <!-- Preload Font Awesome CSS -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.rel='stylesheet'">
-
+    <link rel="stylesheet" href="css/styles.css" />
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Leaflet Routing Machine JS -->
@@ -24,74 +24,6 @@
     <script src="js/map-manager.js"></script>
     <script src="js/route-optimizer-service.js"></script>
     <script src="js/alpine-component.js"></script>
-    <style>
-        [x-cloak] {
-            display: none !important;
-        }
-
-        .glass-effect {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .custom-shadow {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .route-card {
-            transition: all 0.3s ease;
-        }
-
-        .route-card:hover {
-            transform: translateY(-2px);
-        }
-
-        /* Hide the default routing machine itinerary panel */
-        .leaflet-routing-container {
-            display: none;
-        }
-
-        /* Ensure map container has proper dimensions */
-        #map {
-            min-height: 500px;
-            height: 32rem;
-            width: 100%;
-        }
-
-        /* Optimize marker rendering */
-        .custom-marker {
-            width: 24px !important;
-            height: 24px !important;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .depot-marker {
-            width: 32px !important;
-            height: 32px !important;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            border: 3px solid white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-    </style>
     <script>
         tailwind.config = {
             theme: {
