@@ -80,24 +80,13 @@ function routeOptimizer() {
 
             console.log('Generating executive summary...');
             const result = this.optimizationResult;
-            const unoptimizedDistance = 1440; 
             const savings = result.savings || 0;
-            const efficiency = Math.max(0, Math.round((savings / unoptimizedDistance) * 100));
-            const carbonReduction = Math.round(savings * 0.27 * 10) / 10;
-            const fuelSaved = Math.round((savings / 100) * 10 * 6.5); 
 
             const summary = {
                 totalStops: result.total_orders || 0,
                 totalDistance: `${result.total_distance || 0} km`,
                 totalTime: this.formatTime(result.total_time || 0),
-                estimatedFuelCost: `zł${result.estimated_fuel_cost || 0}`,
                 savings: `${savings} km`,
-                efficiency: `${efficiency}%`,
-                carbonReduction: `${carbonReduction} kg CO2`,
-                costSavings: `zł${fuelSaved}`,
-                deliveryCost: `zł${Math.round((result.total_distance || 0) * 0.8)}`,
-                driverCost: `zł${Math.round(((result.total_time || 0) / 60) * 25)}`,
-                profitMargin: `${Math.round((this.totalOrderValue - (result.estimated_fuel_cost || 0) - ((result.total_time || 0) / 60) * 25) / this.totalOrderValue * 100)}%`,
                 startTime: '08:00',
                 firstDelivery: '09:30',
                 lastDelivery: result.route_steps?.length ? result.route_steps[result.route_steps.length - 1]?.estimated_arrival : '16:45',
@@ -108,7 +97,6 @@ function routeOptimizer() {
             return summary;
         },
 
-        // Priority Breakdown - Fixed computed property
         get priorityBreakdown() {
             const breakdown = {
                 high: { count: 0, value: 0, colorClass: 'bg-red-500' },
@@ -133,7 +121,6 @@ function routeOptimizer() {
             return this.orders.reduce((sum, order) => sum + order.total_amount, 0);
         },
 
-        // Toggle summary visibility
         toggleSummary() {
             this.showRouteSummary = !this.showRouteSummary;
             console.log('Summary toggled to:', this.showRouteSummary);
@@ -168,7 +155,6 @@ function routeOptimizer() {
             }
         },
 
-        // Export Summary Function
         exportSummary() {
             if (!this.optimizationResult) {
                 console.warn('No optimization result to export');
@@ -180,7 +166,19 @@ function routeOptimizer() {
                 optimization_date: new Date().toLocaleDateString(),
                 driver: this.selectedDriver.full_name,
                 vehicle: this.selectedDriver.vehicle_details,
-                summary: summary,
+                summary: {
+                    totalStops: summary.totalStops,
+                    totalDistance: summary.totalDistance,
+                    totalTime: summary.totalTime,
+                    savings: summary.savings,
+                    timeline: {
+                        startTime: summary.startTime,
+                        firstDelivery: summary.firstDelivery,
+                        lastDelivery: summary.lastDelivery,
+                        returnTime: summary.returnTime
+                    }
+                },
+                priority_breakdown: this.priorityBreakdown,
                 route_details: this.optimizationResult.route_steps,
                 orders: this.orders.map(order => ({
                     id: order.id,
@@ -191,7 +189,6 @@ function routeOptimizer() {
                 }))
             };
 
-            // Create and download JSON file
             const dataStr = JSON.stringify(exportData, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(dataBlob);
@@ -206,10 +203,9 @@ function routeOptimizer() {
             console.log('Route summary exported');
         },
 
-        // Calculate return time based on total route time
         calculateReturnTime(totalMinutes) {
             const startTime = new Date();
-            startTime.setHours(8, 0, 0, 0); // 8 AM start
+            startTime.setHours(8, 0, 0, 0);
             const returnTime = new Date(startTime.getTime() + (totalMinutes * 60000));
             return returnTime.toLocaleTimeString('pl-PL', {
                 hour: '2-digit',

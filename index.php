@@ -196,13 +196,6 @@
                         x-transition:enter-end="opacity-100 transform translate-y-0"
                         class="bg-white rounded-xl custom-shadow p-6">
 
-                        <!-- Debug info - remove in production -->
-                        <div class="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
-                            Debug: Summary visible = <span x-text="showRouteSummary"></span>,
-                            Has result = <span x-text="!!optimizationResult"></span>,
-                            Executive summary = <span x-text="!!executiveSummary"></span>
-                        </div>
-
                         <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
                             <i class="fas fa-chart-bar text-primary mr-2"></i>
                             Route Summary & Analytics
@@ -211,8 +204,8 @@
                             </button>
                         </h2>
 
-                        <!-- Executive Summary Grid -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                        <!-- Executive Summary Grid - Reduced to 3 columns -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                             <div class="text-center p-4 bg-blue-50 rounded-xl border border-blue-200">
                                 <div class="text-3xl font-bold text-blue-600 mb-1" x-text="executiveSummary?.totalStops || '0'"></div>
                                 <div class="text-xs text-blue-700 uppercase font-medium">Total Stops</div>
@@ -228,61 +221,52 @@
                                 <div class="text-xs text-purple-700 uppercase font-medium">Total Time</div>
                                 <div class="text-xs text-purple-600 mt-1">Including stops</div>
                             </div>
-                            <div class="text-center p-4 bg-orange-50 rounded-xl border border-orange-200">
-                                <div class="text-3xl font-bold text-orange-600 mb-1" x-text="executiveSummary?.estimatedFuelCost || 'zł0'"></div>
-                                <div class="text-xs text-orange-700 uppercase font-medium">Fuel Cost</div>
-                                <div class="text-xs text-orange-600 mt-1">Estimated</div>
-                            </div>
                         </div>
 
-                        <!-- Rest of the summary content remains the same -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <!-- Optimization Impact -->
-                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-5 rounded-xl border border-green-200">
-                                <h3 class="font-semibold text-green-800 mb-4 flex items-center">
-                                    <i class="fas fa-leaf mr-2"></i>Optimization Impact
+                        <!-- Priority & Timeline Analysis -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Priority Breakdown -->
+                            <div class="bg-gray-50 p-5 rounded-xl">
+                                <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-flag mr-2"></i>Priority Breakdown
                                 </h3>
-                                <div class="space-y-3">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-green-700">Distance Saved:</span>
-                                        <span class="font-bold text-green-600" x-text="executiveSummary?.savings || '0 km'"></span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-green-700">CO2 Reduction:</span>
-                                        <span class="font-bold text-green-600" x-text="executiveSummary?.carbonReduction || '0 kg'"></span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-green-700">Efficiency Gain:</span>
-                                        <span class="font-bold text-green-600" x-text="executiveSummary?.efficiency || '0%'"></span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-sm text-green-700">Cost Savings:</span>
-                                        <span class="font-bold text-green-600" x-text="executiveSummary?.costSavings || 'zł0'"></span>
-                                    </div>
+                                <div class="space-y-2">
+                                    <template x-for="priority in priorityBreakdown" :key="priority.level">
+                                        <div class="flex items-center justify-between py-2">
+                                            <div class="flex items-center">
+                                                <div :class="priority.colorClass" class="w-3 h-3 rounded-full mr-3"></div>
+                                                <span class="text-sm capitalize" x-text="priority.level + ' Priority'"></span>
+                                            </div>
+                                            <div class="flex items-center space-x-4">
+                                                <span class="text-sm font-medium" x-text="priority.count + ' orders'"></span>
+                                                <span class="text-sm font-bold text-green-600" x-text="formatCurrency(priority.value)"></span>
+                                            </div>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
 
-                            <!-- Financial Overview -->
-                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200">
-                                <h3 class="font-semibold text-blue-800 mb-4 flex items-center">
-                                    <i class="fas fa-dollar-sign mr-2"></i>Financial Overview
+                            <!-- Timeline Summary -->
+                            <div class="bg-gray-50 p-5 rounded-xl">
+                                <h3 class="font-semibold text-gray-800 mb-4 flex items-center">
+                                    <i class="fas fa-clock mr-2"></i>Timeline Summary
                                 </h3>
                                 <div class="space-y-3">
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-blue-700">Total Order Value:</span>
-                                        <span class="font-bold text-blue-600" x-text="formatCurrency(totalOrderValue)"></span>
+                                        <span class="text-sm text-gray-600">Start Time:</span>
+                                        <span class="font-medium" x-text="executiveSummary?.startTime || '08:00'"></span>
                                     </div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-blue-700">Delivery Cost:</span>
-                                        <span class="font-bold text-blue-600" x-text="executiveSummary?.deliveryCost || 'zł0'"></span>
+                                        <span class="text-sm text-gray-600">First Delivery:</span>
+                                        <span class="font-medium" x-text="executiveSummary?.firstDelivery || '09:30'"></span>
                                     </div>
                                     <div class="flex justify-between items-center">
-                                        <span class="text-sm text-blue-700">Driver Time Cost:</span>
-                                        <span class="font-bold text-blue-600" x-text="executiveSummary?.driverCost || 'zł0'"></span>
+                                        <span class="text-sm text-gray-600">Last Delivery:</span>
+                                        <span class="font-medium" x-text="executiveSummary?.lastDelivery || '16:45'"></span>
                                     </div>
                                     <div class="flex justify-between items-center border-t pt-2">
-                                        <span class="text-sm font-medium text-blue-800">Profit Margin:</span>
-                                        <span class="font-bold text-blue-600" x-text="executiveSummary?.profitMargin || '0%'"></span>
+                                        <span class="text-sm font-medium text-gray-700">Return to Depot:</span>
+                                        <span class="font-bold text-primary" x-text="executiveSummary?.returnTime || '18:00'"></span>
                                     </div>
                                 </div>
                             </div>
@@ -296,22 +280,6 @@
                             Optimized Route Details
                         </h2>
                         <div class="space-y-4">
-                            <!-- Route Summary -->
-                            <div class="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-lg border border-green-200">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-trophy text-yellow-500 text-xl mr-3"></i>
-                                        <div>
-                                            <div class="font-semibold text-gray-800">Optimal Route Generated</div>
-                                            <div class="text-sm text-gray-600">Best path for all deliveries</div>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-lg font-bold text-green-600" x-text="'Saved: ' + (optimizationResult?.savings || 0) + ' km'"></div>
-                                        <div class="text-sm text-gray-500">vs. unoptimized</div>
-                                    </div>
-                                </div>
-                            </div>
                             <!-- Route Steps -->
                             <div class="space-y-3">
                                 <template x-for="(step, index) in (optimizationResult?.route_steps || [])" :key="index">

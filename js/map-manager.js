@@ -168,14 +168,13 @@ class MapManager {
         const routeCoordinates = this.buildRouteCoordinates();
 
         try {
-            // Initialize routing with performance optimizations
             this.data.routingControl = L.Routing.control({
                 waypoints: routeCoordinates.map(coord => L.latLng(coord[0], coord[1])),
                 routeWhileDragging: false,
                 addWaypoints: false,
                 show: false,
                 createMarker: function() {
-                    return null; // We already have our custom markers
+                    return null; 
                 },
                 lineOptions: {
                     styles: [{
