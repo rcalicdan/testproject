@@ -205,8 +205,7 @@ class MapManager {
 
     buildRouteCoordinates() {
         const coordinates = [this.depotCoordinates];
-        
-        // Add coordinates based on optimization result route steps
+           
         if (this.data.optimizationResult && this.data.optimizationResult.route_steps) {
             this.data.optimizationResult.route_steps.forEach(step => {
                 const order = this.data.orders.find(o => 

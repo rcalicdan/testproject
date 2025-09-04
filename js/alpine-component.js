@@ -1,7 +1,6 @@
 function routeOptimizer() {
     const data = new RouteOptimizerData();
 
-    // Set the selected driver BEFORE creating the services
     data.selectedDriver = data.drivers[0];
 
     const mapManager = new MapManager(data);
@@ -16,7 +15,7 @@ function routeOptimizer() {
 
         init() {
             console.log('RouteOptimizer component initializing...');
-            console.log('Selected driver on init:', this.selectedDriver); // Add this debug log
+            console.log('Selected driver on init:', this.selectedDriver); 
 
             this.$nextTick(() => {
                 setTimeout(() => {
@@ -29,8 +28,8 @@ function routeOptimizer() {
         },
 
         async optimizeRoutes() {
-            console.log('optimizeRoutes called with driver:', this.selectedDriver); // Add debug log
-            console.log('Orders available:', this.orders.length); // Add debug log
+            console.log('optimizeRoutes called with driver:', this.selectedDriver); 
+            console.log('Orders available:', this.orders.length);
 
             if (!optimizerService.canOptimize()) {
                 console.warn('Cannot optimize routes - missing driver or orders');

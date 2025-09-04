@@ -75,7 +75,7 @@ class RouteOptimizerData {
             }
         ];
 
-        this.selectedDriver = this.drivers[0]; // Set default here
+        this.selectedDriver = this.drivers[0]; 
         this.loading = false;
         this.optimizationResult = null;
         this.map = null;
