@@ -5,7 +5,7 @@ require __DIR__ . '/vendor/autoload.php';
 // Hardcoded API key for testing purposes ONLY. Do NOT use in production.
 $key = 'AIzaSyDyd2xW1YJlMMO6E1iWM_gNjx6qiMGSiJk';
 
-// Free‑tier model
+
 $model = 'gemini-2.5-flash';
 
 $uri   = 'https://generativelanguage.googleapis.com/v1beta/models/'
