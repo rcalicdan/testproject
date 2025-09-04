@@ -15,7 +15,11 @@ function routeOptimizer() {
 
         init() {
             console.log('RouteOptimizer component initializing...');
-            console.log('Selected driver on init:', this.selectedDriver); 
+            console.log('Selected driver on init:', this.selectedDriver);
+
+            this.$watch('loading', (value) => {
+                console.log('Loading state changed:', value);
+            });
 
             this.$nextTick(() => {
                 setTimeout(() => {
@@ -28,7 +32,7 @@ function routeOptimizer() {
         },
 
         async optimizeRoutes() {
-            console.log('optimizeRoutes called with driver:', this.selectedDriver); 
+            console.log('optimizeRoutes called with driver:', this.selectedDriver);
             console.log('Orders available:', this.orders.length);
 
             if (!optimizerService.canOptimize()) {
@@ -38,10 +42,16 @@ function routeOptimizer() {
                 return;
             }
 
+            // Set loading state directly on the Alpine component
+            this.loading = true;
+
             try {
                 await optimizerService.optimizeRoutes();
             } catch (error) {
                 console.error('Route optimization failed:', error);
+            } finally {
+                // Ensure loading is turned off
+                this.loading = false;
             }
         },
 
@@ -57,8 +67,12 @@ function routeOptimizer() {
         },
 
         resetOptimization() {
-            if (optimizerService) {
-                optimizerService.resetOptimization();
+            this.optimizationResult = null;
+            this.optimizationError = null;
+            this.loading = false;
+
+            if (mapManager) {
+                mapManager.clearRoute();
             }
         },
 
@@ -194,7 +208,6 @@ function routeOptimizer() {
         }
     };
 }
-
 
 window.routeOptimizer = routeOptimizer;
 

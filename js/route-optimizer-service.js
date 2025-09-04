@@ -14,7 +14,6 @@ class RouteOptimizerService {
             throw new Error('No orders to optimize');
         }
 
-        this.data.loading = true;
         console.log('Starting route optimization...');
 
         try {
@@ -34,8 +33,7 @@ class RouteOptimizerService {
         } catch (error) {
             console.error('Optimization failed:', error);
             this.handleOptimizationError(error);
-        } finally {
-            this.data.loading = false;
+            throw error;
         }
     }
 
@@ -229,7 +227,6 @@ class RouteOptimizerService {
     resetOptimization() {
         this.data.optimizationResult = null;
         this.data.optimizationError = null;
-        this.data.loading = false;
 
         if (window.mapManager) {
             window.mapManager.clearRoute();

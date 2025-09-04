@@ -213,14 +213,75 @@
             </div>
         </div>
 
-        <!-- Loading Overlay -->
-        <div x-show="loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="glass-effect rounded-xl p-8 text-center max-w-sm mx-4">
-                <div class="animate-spin rounded-full h-16 w-16 border-4 border-primary border-t-transparent mx-auto mb-4"></div>
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">Optimizing Routes</h3>
-                <p class="text-gray-600">Calculating the best delivery path...</p>
+        <!-- Loading Overlay with maximum z-index -->
+        <div x-show="loading"
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            class="loading-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center"
+            style="z-index: 9999 !important; display: none;">
+
+            <!-- Blur background overlay -->
+            <div class="absolute inset-0 bg-black bg-opacity-40" style="backdrop-filter: blur(8px);"></div>
+
+            <!-- Loading content -->
+            <div class="loading-glass-effect rounded-2xl p-8 text-center max-w-sm mx-4 relative transform">
+                <!-- Animated spinner -->
+                <div class="relative mx-auto mb-6">
+                    <div class="animate-spin rounded-full h-20 w-20 border-4 border-primary border-t-transparent mx-auto"></div>
+                    <div class="absolute inset-0 rounded-full border-4 border-primary opacity-20"></div>
+                </div>
+
+                <!-- Loading text -->
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Optimizing Routes</h3>
+                <p class="text-gray-600 mb-4">Calculating the best delivery path using advanced algorithms...</p>
+
+                <!-- Progress indicators -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-center text-sm text-gray-500">
+                        <i class="fas fa-map-marked-alt mr-2 text-primary"></i>
+                        Analyzing delivery locations
+                    </div>
+                    <div class="flex items-center justify-center text-sm text-gray-500">
+                        <i class="fas fa-route mr-2 text-primary"></i>
+                        Computing optimal path
+                    </div>
+                    <div class="flex items-center justify-center text-sm text-gray-500">
+                        <i class="fas fa-clock mr-2 text-primary"></i>
+                        Estimating delivery times
+                    </div>
+                </div>
+
+                <!-- Loading bar animation -->
+                <div class="mt-6">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-primary to-secondary h-2 rounded-full animate-pulse"
+                            style="width: 100%; animation: loading-progress 2s ease-in-out infinite;">
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+
+        <style>
+            @keyframes loading-progress {
+                0% {
+                    width: 0%;
+                }
+
+                50% {
+                    width: 70%;
+                }
+
+                100% {
+                    width: 100%;
+                }
+            }
+        </style>
     </div>
 </body>
+
 </html>
