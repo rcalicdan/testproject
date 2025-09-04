@@ -75,9 +75,11 @@ class RouteOptimizerData {
             }
         ];
 
-        this.selectedDriver = this.drivers[0]; 
+        this.selectedDriver = null; 
         this.loading = false;
         this.optimizationResult = null;
+        this.optimizationError = null;
+        this.showRouteSummary = false; 
         this.map = null;
         this.markers = [];
         this.routingControl = null;
@@ -94,5 +96,17 @@ class RouteOptimizerData {
 
     get pendingOrders() {
         return this.orders.filter(order => order.status === 'pending');
+    }
+
+    get highPriorityOrders() {
+        return this.orders.filter(order => order.priority === 'high');
+    }
+
+    get mediumPriorityOrders() {
+        return this.orders.filter(order => order.priority === 'medium');
+    }
+
+    get lowPriorityOrders() {
+        return this.orders.filter(order => order.priority === 'low');
     }
 }

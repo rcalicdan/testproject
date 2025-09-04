@@ -47,7 +47,7 @@
                     <div>
                         <h1 class="text-3xl font-bold flex items-center">
                             <i class="fas fa-route mr-3"></i>
-                            Poland Route Optimizer
+                            Poland Route Optimization
                         </h1>
                         <p class="text-blue-100 mt-2">Professional delivery route optimization for Polish cities</p>
                     </div>
@@ -139,13 +139,35 @@
                             <!-- Quick Stats -->
                             <div x-show="optimizationResult" class="grid grid-cols-2 gap-3">
                                 <div class="bg-green-50 p-3 rounded-lg text-center">
-                                    <div class="text-2xl font-bold text-green-600" x-text="Math.round((optimizationResult?.total_distance || 0) / 1000) + ' km'"></div>
+                                    <div class="text-2xl font-bold text-green-600" x-text="Math.round((optimizationResult?.total_distance || 0)) + ' km'"></div>
                                     <div class="text-xs text-green-700 uppercase">Total Distance</div>
                                 </div>
                                 <div class="bg-blue-50 p-3 rounded-lg text-center">
-                                    <div class="text-2xl font-bold text-blue-600" x-text="Math.round((optimizationResult?.total_time || 0) / 60) + ' min'"></div>
+                                    <div class="text-2xl font-bold text-blue-600" x-text="Math.round((optimizationResult?.total_time || 0) / 60) + 'h ' + Math.round((optimizationResult?.total_time || 0) % 60) + 'm'"></div>
                                     <div class="text-xs text-blue-700 uppercase">Total Time</div>
                                 </div>
+                            </div>
+
+                            <!-- Summary Actions -->
+                            <div x-show="optimizationResult" class="space-y-2">
+                                <button @click="showRouteSummary = !showRouteSummary"
+                                    class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+                                    <span x-show="!showRouteSummary">
+                                        <i class="fas fa-chart-bar mr-2"></i>View Summary
+                                    </span>
+                                    <span x-show="showRouteSummary">
+                                        <i class="fas fa-eye-slash mr-2"></i>Hide Summary
+                                    </span>
+                                </button>
+                                <button @click="resetOptimization()"
+                                    class="w-full bg-red-50 hover:bg-red-100 text-red-600 py-2 px-4 rounded-lg text-sm font-medium transition-colors">
+                                    <i class="fas fa-redo mr-2"></i>Reset Route
+                                </button>
+                                <!-- Debug button - remove in production -->
+                                <button @click="debugSummaryState()"
+                                    class="w-full bg-yellow-50 hover:bg-yellow-100 text-yellow-600 py-1 px-4 rounded text-xs">
+                                    Debug Summary
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -165,6 +187,106 @@
                             </h2>
                         </div>
                         <div id="map" class="h-[32rem] w-full"></div>
+                    </div>
+
+                    <!-- Route Summary Dashboard -->
+                    <div x-show="optimizationResult && showRouteSummary"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 transform translate-y-4"
+                        x-transition:enter-end="opacity-100 transform translate-y-0"
+                        class="bg-white rounded-xl custom-shadow p-6">
+
+                        <!-- Debug info - remove in production -->
+                        <div class="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800">
+                            Debug: Summary visible = <span x-text="showRouteSummary"></span>,
+                            Has result = <span x-text="!!optimizationResult"></span>,
+                            Executive summary = <span x-text="!!executiveSummary"></span>
+                        </div>
+
+                        <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                            <i class="fas fa-chart-bar text-primary mr-2"></i>
+                            Route Summary & Analytics
+                            <button @click="exportSummary()" class="ml-auto text-sm bg-primary text-white px-3 py-1 rounded-lg hover:bg-opacity-90">
+                                <i class="fas fa-download mr-1"></i>Export
+                            </button>
+                        </h2>
+
+                        <!-- Executive Summary Grid -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="text-center p-4 bg-blue-50 rounded-xl border border-blue-200">
+                                <div class="text-3xl font-bold text-blue-600 mb-1" x-text="executiveSummary?.totalStops || '0'"></div>
+                                <div class="text-xs text-blue-700 uppercase font-medium">Total Stops</div>
+                                <div class="text-xs text-blue-600 mt-1">+ Depot Return</div>
+                            </div>
+                            <div class="text-center p-4 bg-green-50 rounded-xl border border-green-200">
+                                <div class="text-3xl font-bold text-green-600 mb-1" x-text="executiveSummary?.totalDistance || '0 km'"></div>
+                                <div class="text-xs text-green-700 uppercase font-medium">Total Distance</div>
+                                <div class="text-xs text-green-600 mt-1" x-text="(executiveSummary?.savings || '0 km') + ' saved'"></div>
+                            </div>
+                            <div class="text-center p-4 bg-purple-50 rounded-xl border border-purple-200">
+                                <div class="text-3xl font-bold text-purple-600 mb-1" x-text="executiveSummary?.totalTime || '0h'"></div>
+                                <div class="text-xs text-purple-700 uppercase font-medium">Total Time</div>
+                                <div class="text-xs text-purple-600 mt-1">Including stops</div>
+                            </div>
+                            <div class="text-center p-4 bg-orange-50 rounded-xl border border-orange-200">
+                                <div class="text-3xl font-bold text-orange-600 mb-1" x-text="executiveSummary?.estimatedFuelCost || 'zł0'"></div>
+                                <div class="text-xs text-orange-700 uppercase font-medium">Fuel Cost</div>
+                                <div class="text-xs text-orange-600 mt-1">Estimated</div>
+                            </div>
+                        </div>
+
+                        <!-- Rest of the summary content remains the same -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <!-- Optimization Impact -->
+                            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-5 rounded-xl border border-green-200">
+                                <h3 class="font-semibold text-green-800 mb-4 flex items-center">
+                                    <i class="fas fa-leaf mr-2"></i>Optimization Impact
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-green-700">Distance Saved:</span>
+                                        <span class="font-bold text-green-600" x-text="executiveSummary?.savings || '0 km'"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-green-700">CO2 Reduction:</span>
+                                        <span class="font-bold text-green-600" x-text="executiveSummary?.carbonReduction || '0 kg'"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-green-700">Efficiency Gain:</span>
+                                        <span class="font-bold text-green-600" x-text="executiveSummary?.efficiency || '0%'"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-green-700">Cost Savings:</span>
+                                        <span class="font-bold text-green-600" x-text="executiveSummary?.costSavings || 'zł0'"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Financial Overview -->
+                            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-5 rounded-xl border border-blue-200">
+                                <h3 class="font-semibold text-blue-800 mb-4 flex items-center">
+                                    <i class="fas fa-dollar-sign mr-2"></i>Financial Overview
+                                </h3>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-blue-700">Total Order Value:</span>
+                                        <span class="font-bold text-blue-600" x-text="formatCurrency(totalOrderValue)"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-blue-700">Delivery Cost:</span>
+                                        <span class="font-bold text-blue-600" x-text="executiveSummary?.deliveryCost || 'zł0'"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-blue-700">Driver Time Cost:</span>
+                                        <span class="font-bold text-blue-600" x-text="executiveSummary?.driverCost || 'zł0'"></span>
+                                    </div>
+                                    <div class="flex justify-between items-center border-t pt-2">
+                                        <span class="text-sm font-medium text-blue-800">Profit Margin:</span>
+                                        <span class="font-bold text-blue-600" x-text="executiveSummary?.profitMargin || '0%'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Route Details -->
@@ -193,12 +315,13 @@
                             <!-- Route Steps -->
                             <div class="space-y-3">
                                 <template x-for="(step, index) in (optimizationResult?.route_steps || [])" :key="index">
-                                    <div class="route-card flex items-center p-4 border rounded-lg hover:shadow-md">
+                                    <div class="route-card flex items-center p-4 border rounded-lg hover:shadow-md transition-shadow">
                                         <div class="flex-shrink-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-semibold text-sm"
                                             x-text="index + 1"></div>
                                         <div class="ml-4 flex-1">
                                             <div class="font-medium text-gray-800" x-text="step.location"></div>
                                             <div class="text-sm text-gray-600" x-text="step.description"></div>
+                                            <div class="text-xs text-primary mt-1" x-text="'ETA: ' + step.estimated_arrival"></div>
                                         </div>
                                         <div class="text-right">
                                             <div class="text-sm font-semibold text-gray-700" x-text="step.distance"></div>
@@ -213,7 +336,7 @@
             </div>
         </div>
 
-        <!-- Loading Overlay with maximum z-index -->
+        <!-- Loading Overlay -->
         <div x-show="loading"
             x-transition:enter="transition ease-out duration-300"
             x-transition:enter-start="opacity-0 scale-95"
@@ -222,24 +345,19 @@
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-95"
             class="loading-overlay fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center"
-            style="z-index: 9999 !important; display: none;">
+            style="z-index: 9999 !important;">
 
-            <!-- Blur background overlay -->
             <div class="absolute inset-0 bg-black bg-opacity-40" style="backdrop-filter: blur(8px);"></div>
 
-            <!-- Loading content -->
             <div class="loading-glass-effect rounded-2xl p-8 text-center max-w-sm mx-4 relative transform">
-                <!-- Animated spinner -->
                 <div class="relative mx-auto mb-6">
                     <div class="animate-spin rounded-full h-20 w-20 border-4 border-primary border-t-transparent mx-auto"></div>
                     <div class="absolute inset-0 rounded-full border-4 border-primary opacity-20"></div>
                 </div>
 
-                <!-- Loading text -->
                 <h3 class="text-xl font-bold text-gray-800 mb-3">Optimizing Routes</h3>
                 <p class="text-gray-600 mb-4">Calculating the best delivery path using advanced algorithms...</p>
 
-                <!-- Progress indicators -->
                 <div class="space-y-2">
                     <div class="flex items-center justify-center text-sm text-gray-500">
                         <i class="fas fa-map-marked-alt mr-2 text-primary"></i>
@@ -255,7 +373,6 @@
                     </div>
                 </div>
 
-                <!-- Loading bar animation -->
                 <div class="mt-6">
                     <div class="w-full bg-gray-200 rounded-full h-2">
                         <div class="bg-gradient-to-r from-primary to-secondary h-2 rounded-full animate-pulse"
